@@ -3,19 +3,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <include
-        android:id="@+id/tool_bar"
-        layout="@layout/toolbar" />
+    tools:context=".notes.NotesActivity">
 
     <android.support.v7.widget.AppCompatImageView
-        android:layout_width="match_parent"
         android:id="@+id/background"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/tool_bar"
         android:scaleType="centerCrop"
         android:src="@drawable/background" />
 
-    <include layout="@layout/empty_drops" />
+    <include
+
+        android:id="@+id/tool_bar"
+        layout="@layout/toolbar" />
+
+
+    <com.example.islam.notes.customwidgets.NotesRecyclerView
+        android:id="@+id/notes_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tool_bar"
+         />
+
+    <include
+        android:id="@+id/empty_note"
+        layout="@layout/empty_drops" />
 </RelativeLayout>
