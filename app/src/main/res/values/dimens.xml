@@ -20,4 +20,6 @@
     <dimen name="title_vertical_margin">36dp</dimen>
     <dimen name="add_title_text_size">18sp</dimen>
 
+    <dimen name="picker_sizes">84dp</dimen>
+
 </resources>

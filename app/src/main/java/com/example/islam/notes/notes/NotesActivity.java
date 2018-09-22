@@ -5,45 +5,44 @@ import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.islam.notes.Adapter.NotesAdapter;
+import com.example.islam.notes.Adapter.ResetListener;
 import com.example.islam.notes.R;
 import com.example.islam.notes.add_dialog.AddDialogFragment;
-import com.example.islam.notes.customwidgets.AddListener;
-import com.example.islam.notes.customwidgets.Divider;
+import com.example.islam.notes.Adapter.AddListener;
+import com.example.islam.notes.Adapter.Divider;
+import com.example.islam.notes.Adapter.NotesRecyclerItemClickListener;
 import com.example.islam.notes.customwidgets.NotesRecyclerView;
-import com.example.islam.notes.customwidgets.SimpleTouchCallBack;
+import com.example.islam.notes.Adapter.SimpleTouchCallBack;
+import com.example.islam.notes.extras.Utils;
+import com.example.islam.notes.mark_dialog.MarkDialog;
+import com.example.islam.notes.Adapter.MarkListener;
 import com.example.islam.notes.models.Note;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
-
 public class NotesActivity extends AppCompatActivity
-        implements View.OnClickListener, NotesView, AddListener {
+        implements View.OnClickListener,
+        NotesView, AddListener, NotesRecyclerItemClickListener, MarkListener,
+        ResetListener {
 
-    NotesRecyclerView recyclerView;
-    Toolbar toolbar;
-    AppCompatButton addButton;
-    NotesAdapter adapter;
-    List<Note> arrayList;
+    private NotesRecyclerView recyclerView;
+    private Toolbar toolbar;
+    private AppCompatButton addButton;
+    private NotesAdapter adapter;
+    private List<Note> arrayList;
 
-    View emptyNote;
-    NotesPresenter notesPresenter;
-
-    CompositeDisposable disposable = new CompositeDisposable();
+    private View emptyNote;
+    private NotesPresenter notesPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +58,16 @@ public class NotesActivity extends AppCompatActivity
 
         adapter = new NotesAdapter(this, arrayList);
         adapter.setAddListener(this);
+        adapter.setRecyclerItemClick(this);
+        adapter.setMResetListener(this);
+        adapter.setHasStableIds(true);
 
 
         SimpleTouchCallBack callBack = new SimpleTouchCallBack(adapter);
         ItemTouchHelper helper = new ItemTouchHelper(callBack);
         notesPresenter = new NotesPresenterImpl(this, this);
-        notesPresenter.getNotes();
+        int type = Utils.loadPref(this);
+        notesPresenter.getNotes(type);
 
         emptyNote = findViewById(R.id.empty_note);
         addButton = findViewById(R.id.btn_add);
@@ -106,6 +109,15 @@ public class NotesActivity extends AppCompatActivity
     }
 
 
+    private void showMarkDialog(int position) {
+        MarkDialog markDialog = new MarkDialog();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("note", arrayList.get(position));
+        markDialog.setArguments(bundle);
+        markDialog.show(getSupportFragmentManager(), "mark");
+    }
+
     private void showAddDialog() {
 
         AddDialogFragment dialog = new AddDialogFragment();
@@ -114,27 +126,86 @@ public class NotesActivity extends AppCompatActivity
 
     @Override
     public void setAdapter(List<Note> noteList) {
+
         this.arrayList = noteList;
-        adapter.update(noteList);
+        adapter.update(arrayList);
 
 
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("life", "Paused");
     }
 
 
     @Override
     public void noNote(String messae) {
 
-        Toast.makeText(this, messae, Toast.LENGTH_SHORT).show();
+        arrayList.clear();
+        adapter.update(arrayList);
+        Log.d("size", "Size is  " + arrayList.size());
     }
 
     @Override
     public void add() {
         showAddDialog();
+    }
+
+    @Override
+    public void onItemClicked(int position) {
+        showMarkDialog(position);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        notesPresenter.onDestroy();
+    }
+
+    @Override
+    public void onMarked(int position) {
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.all_notes:
+                notesPresenter.getNotes(Utils.ALL_NOTE_TYPE);
+                Utils.savePref(this, Utils.ALL_NOTE_TYPE);
+                return true;
+            case R.id.complete:
+                notesPresenter.getNotes(Utils.ALL_COMPLETED);
+                Utils.savePref(this, Utils.ALL_COMPLETED);
+                return true;
+            case R.id.add_actoin:
+                showAddDialog();
+                return true;
+            case R.id.least_time:
+                notesPresenter.getNotes(Utils.ALL_ASCENDING);
+                Utils.savePref(this, Utils.ALL_ASCENDING);
+                return true;
+            case R.id.most_time:
+                notesPresenter.getNotes(Utils.ALL_DESCENDING);
+                Utils.savePref(this, Utils.ALL_DESCENDING);
+                return true;
+            case R.id.incomplete:
+                notesPresenter.getNotes(Utils.ALL_IN_COMPLETED);
+                Utils.savePref(this, Utils.ALL_IN_COMPLETED);
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void reset() {
+
+        Utils.savePref(this, Utils.ALL_NOTE_TYPE);
+
+        Utils.loadPref(this);
     }
 }

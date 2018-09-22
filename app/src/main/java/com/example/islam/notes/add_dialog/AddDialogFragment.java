@@ -11,14 +11,16 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
+
 import android.widget.Toast;
 
 import com.example.islam.notes.R;
+import com.example.islam.notes.customwidgets.DatePicker;
 import com.example.islam.notes.data_repository.AppDataBase;
 import com.example.islam.notes.data_repository.NoteDao;
 import com.example.islam.notes.models.Note;
 
+import java.util.Calendar;
 import java.util.Objects;
 
 public class AddDialogFragment extends DialogFragment implements View.OnClickListener, AddNoteView {
@@ -33,6 +35,12 @@ public class AddDialogFragment extends DialogFragment implements View.OnClickLis
     public AddDialogFragment() {
         presenter = new AddPresenterImpl(getContext(), this);
 
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.DialogTheme);
     }
 
     @Nullable
@@ -70,7 +78,11 @@ public class AddDialogFragment extends DialogFragment implements View.OnClickLis
     }
 
     private void addNote() {
-        Note note = new Note(etDrop.getText().toString(), 0, 0, false);
+
+        String what = etDrop.getText().toString();
+        long now = System.currentTimeMillis();
+
+        Note note = new Note(what, now, datePicker.getTime(), false);
         presenter.addNote(note);
 
     }

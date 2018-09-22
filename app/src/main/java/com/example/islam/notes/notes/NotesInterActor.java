@@ -15,5 +15,5 @@ interface NotesInterActor {
 
     }
 
-    void getNotes(OnNotesDone onNotesDone);
+    void getNotes(int type, OnNotesDone onNotesDone);
 }

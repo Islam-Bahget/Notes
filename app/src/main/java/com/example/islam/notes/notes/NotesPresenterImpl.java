@@ -15,16 +15,16 @@ class NotesPresenterImpl implements NotesPresenter, NotesInterActor.OnNotesDone 
     private Context context;
     private NotesView notesView;
 
-     NotesPresenterImpl(Context context, NotesView notesView) {
+    NotesPresenterImpl(Context context, NotesView notesView) {
         this.context = context;
         this.notesView = notesView;
         this.interActor = new NotesInterActorImpl(context);
     }
 
     @Override
-    public void getNotes() {
+    public void getNotes(int type) {
         if (notesView != null) {
-            interActor.getNotes(this);
+            interActor.getNotes(type, this);
         }
 
     }
