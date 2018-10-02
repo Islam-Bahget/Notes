@@ -1,5 +1,8 @@
 package com.example.islam.notes.notes;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
@@ -26,9 +29,14 @@ import com.example.islam.notes.extras.Utils;
 import com.example.islam.notes.mark_dialog.MarkDialog;
 import com.example.islam.notes.Adapter.MarkListener;
 import com.example.islam.notes.models.Note;
+import com.example.islam.notes.services.NotManager;
+import com.example.islam.notes.services.NotificationService;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 public class NotesActivity extends AppCompatActivity
         implements View.OnClickListener,
@@ -40,7 +48,7 @@ public class NotesActivity extends AppCompatActivity
     private AppCompatButton addButton;
     private NotesAdapter adapter;
     private List<Note> arrayList;
-
+    private AppCompatImageView background;
     private View emptyNote;
     private NotesPresenter notesPresenter;
 
@@ -51,11 +59,22 @@ public class NotesActivity extends AppCompatActivity
 
         initViews();
         initBackground();
+
+
+        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(this, NotificationService.class);
+        PendingIntent intent1 = PendingIntent.getService(this, 100
+                , intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        assert manager != null;
+        manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                1000, 5000, intent1);
     }
 
     private void initViews() {
         arrayList = new ArrayList<>();
 
+        background = findViewById(R.id.background);
+        Glide.with(this).load(R.drawable.background).into(background);
         adapter = new NotesAdapter(this, arrayList);
         adapter.setAddListener(this);
         adapter.setRecyclerItemClick(this);

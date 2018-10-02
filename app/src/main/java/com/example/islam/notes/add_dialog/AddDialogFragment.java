@@ -8,6 +8,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatImageButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,6 +83,7 @@ public class AddDialogFragment extends DialogFragment implements View.OnClickLis
         String what = etDrop.getText().toString();
         long now = System.currentTimeMillis();
 
+        Log.d("v", "Time is " + datePicker.getTime());
         Note note = new Note(what, now, datePicker.getTime(), false);
         presenter.addNote(note);
 
