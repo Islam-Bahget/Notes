@@ -1,4 +1,4 @@
-package com.example.islam.notes.services;
+package com.example.islam.notes.models.services;
 
 import android.support.annotation.NonNull;
 

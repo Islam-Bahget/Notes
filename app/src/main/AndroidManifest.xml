@@ -31,7 +31,7 @@
         <activity android:name=".TestRoom" />
 
         <service
-            android:name=".services.NotificationService"
+            android:name=".models.services.NotificationService"
             android:exported="false">
 
         </service>

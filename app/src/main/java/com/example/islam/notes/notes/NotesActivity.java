@@ -29,14 +29,10 @@ import com.example.islam.notes.extras.Utils;
 import com.example.islam.notes.mark_dialog.MarkDialog;
 import com.example.islam.notes.Adapter.MarkListener;
 import com.example.islam.notes.models.Note;
-import com.example.islam.notes.services.NotManager;
-import com.example.islam.notes.services.NotificationService;
+import com.example.islam.notes.models.services.NotificationService;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
 public class NotesActivity extends AppCompatActivity
         implements View.OnClickListener,
